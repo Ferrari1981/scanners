@@ -233,13 +233,23 @@ public class MainActivityNewScanner extends AppCompatActivity  {
                     materialTextViewToolBar.setText("Клиент");
                     // TODO: 25.01.2023  подключение после получение BINDER
                     МетодСобыытиеКнопокСканирования(new Intent("activity"));
-                    МетодЗапускКлиентаИлиСервера(new FragmentScannerUser());//todo Запускам клиента или сервер фрагмент
+                    // TODO: 07.02.2023  первый запуск фгармента
 
+                    // TODO: 07.02.2023 второй запуск фрагмента
+                    if (fragment!=null) {
+                        fragment.onDetach();
+                        fragmentTransaction.remove(fragment);
+                    }
+                    fragment=new FragmentScannerUser();
+                    МетодЗапускКлиентаИлиСервера(fragment);//todo Запускам клиента или сервер фрагмент
                 }, 1000);
             }
             });
+            
+            МетодУжеЗапускаСканнерВторойФрагмент();
             // TODO: 24.01.2023 методы для блютусаа
-            МетодЗапускКлиентаИлиСервера(new FragmentBootScanner());//todo Запускам клиента или сервер фрагмент
+            Log.d(this.getClass().getName(), " binderСканнер " + binderСканнер+  " КоличестовФрагмент ");
+
             ОтветныйHendlerОтСлужбы();
             МетодНастрокийBlueTools();
             Log.d(this.getClass().getName(), " binderСканнер " + binderСканнер);
@@ -263,6 +273,27 @@ public class MainActivityNewScanner extends AppCompatActivity  {
 
     }
 
+    private void МетодУжеЗапускаСканнерВторойФрагмент() {
+        try {
+            // TODO: 07.02.2023 запускаем
+        fragment=new FragmentBootScanner();
+        МетодЗапускКлиентаИлиСервера(fragment);//todo Запускам клиента или сервер фрагмент
+    } catch (Exception e) {
+        e.printStackTrace();
+        Log.e(this.getClass().getName(), "Ошибка " + e + " Метод :" + Thread.currentThread().getStackTrace()[2].getMethodName() + " Линия  :"
+                + Thread.currentThread().getStackTrace()[2].getLineNumber());
+        ContentValues valuesЗаписываемОшибки = new ContentValues();
+        valuesЗаписываемОшибки.put("Error", e.toString().toLowerCase());
+        valuesЗаписываемОшибки.put("Klass", this.getClass().getName());
+        valuesЗаписываемОшибки.put("Metod", Thread.currentThread().getStackTrace()[2].getMethodName());
+        valuesЗаписываемОшибки.put("LineError", Thread.currentThread().getStackTrace()[2].getLineNumber());
+        final Object ТекущаяВерсияПрограммы = version;
+        Integer ЛокальнаяВерсияПОСравнение = Integer.parseInt(ТекущаяВерсияПрограммы.toString());
+        valuesЗаписываемОшибки.put("whose_error", ЛокальнаяВерсияПОСравнение);
+        new SubClassErrors(getApplicationContext()).МетодЗаписиОшибок(valuesЗаписываемОшибки);
+    }
+
+}
 
 
     @SuppressLint("MissingPermission")
